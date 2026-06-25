@@ -1,0 +1,32 @@
+backend:
+  name: github
+  repo: your-username/your-repo-name # Replace with your GitHub repo
+  branch: main # Branch to update (optional; defaults to master)
+
+# Since Vercel doesn't allow local uploads, and user requested external image URLs only
+media_folder: "public/img" # Dummy path
+public_folder: "/img" # Dummy path
+
+collections:
+  - name: "posts"
+    label: "Posts"
+    folder: "content/posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - label: "Section"
+        name: "section"
+        widget: "select"
+        options: ["Music", "Programming", "Spirituality", "Family"]
+        required: true
+      - label: "Subsection"
+        name: "subsection"
+        widget: "select"
+        options: ["", "Songs", "Drums", "Bands", "Anecdotes", "Travel", "Life"]
+        required: false
+      - {label: "Featured Image URL", name: "featured_image", widget: "string", required: false, hint: "Paste an external image URL"}
+      - {label: "Excerpt", name: "excerpt", widget: "text", required: false, hint: "Short summary for the homepage"}
+      - {label: "Body", name: "body", widget: "markdown"}
+      - {label: "Draft", name: "draft", widget: "boolean", default: false, required: false}
