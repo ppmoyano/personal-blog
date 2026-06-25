@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: your-username/your-repo-name # Replace with your GitHub repo
+  repo: ppmoyano/personal-blog # Replace with your GitHub repo
   branch: main # Branch to update (optional; defaults to master)
 
 # Since Vercel doesn't allow local uploads, and user requested external image URLs only
