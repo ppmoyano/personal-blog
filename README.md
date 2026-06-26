@@ -48,7 +48,7 @@ Before pushing to GitHub, you must update the Decap CMS configuration to point t
 1. Log into [Vercel](https://vercel.com) and click **"Add New Project"**.
 2. Import your GitHub repository.
 3. **Important**: Leave the Build Command and Output Directory fields **empty** (or default).
-4. Click **Deploy**. Vercel will automatically read `vercel.json`, download the `vercel-community/php` runtime, and deploy your site.
+4. Click **Deploy**. Vercel will automatically read `vercel.json`, download the `vercel-php` runtime, and deploy your site.
 
 ### Step 3: Setup GitHub OAuth Authentication
 Because you are deploying on Vercel (not Netlify), Decap CMS requires a way to authenticate with GitHub securely to commit files. You need to set up an OAuth application.
