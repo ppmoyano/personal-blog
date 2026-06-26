@@ -2,6 +2,12 @@ backend:
   name: github
   repo: ppmoyano/personal-blog # Replace with your GitHub repo
   branch: main # Branch to update (optional; defaults to master)
+  # IMPORTANT: This prevents Decap CMS from using Netlify's auth endpoint.
+  # Replace this URL with your deployed OAuth Provider's URL.
+  base_url: https://my-blog-oauth.vercel.app/
+
+# Enable local testing (bypasses GitHub auth and writes to local files)
+local_backend: true
 
 # Since Vercel doesn't allow local uploads, and user requested external image URLs only
 media_folder: "public/img" # Dummy path
@@ -19,12 +25,23 @@ collections:
       - label: "Section"
         name: "section"
         widget: "select"
-        options: ["Music", "Programming", "Spirituality", "Family"]
+        options: 
+          - {label: "Música", value: "music"}
+          - {label: "IT", value: "programming"}
+          - {label: "Espiritualidad", value: "spirituality"}
+          - {label: "Familia", value: "family"}
         required: true
       - label: "Subsection"
         name: "subsection"
         widget: "select"
-        options: ["", "Songs", "Drums", "Bands", "Anecdotes", "Travel", "Life"]
+        options: 
+          - {label: "Ninguno", value: ""}
+          - {label: "Canciones", value: "songs"}
+          - {label: "Batería", value: "drums"}
+          - {label: "Bandas", value: "bands"}
+          - {label: "Anécdotas", value: "anecdotes"}
+          - {label: "Viajes", value: "travel"}
+          - {label: "Vida", value: "life"}
         required: false
       - {label: "Featured Image URL", name: "featured_image", widget: "string", required: false, hint: "Paste an external image URL"}
       - {label: "Excerpt", name: "excerpt", widget: "text", required: false, hint: "Short summary for the homepage"}
