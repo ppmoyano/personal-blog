@@ -24,6 +24,22 @@ if (strpos($path, '/admin') === 0) {
 
 function e($str) { return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8'); }
 
+function translate_cat($slug) {
+    $map = [
+        'music' => 'Música',
+        'programming' => 'IT',
+        'spirituality' => 'Espiritualidad',
+        'family' => 'Familia',
+        'songs' => 'Canciones',
+        'drums' => 'Batería',
+        'bands' => 'Bandas',
+        'anecdotes' => 'Anécdotas',
+        'travel' => 'Viajes',
+        'life' => 'Vida'
+    ];
+    return $map[strtolower($slug)] ?? ucfirst($slug);
+}
+
 function get_all_posts() {
     $posts = [];
     $dir = __DIR__ . '/../content/posts';
@@ -146,6 +162,7 @@ ob_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Modern Blog</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root { 
             --bg: #111118; 
@@ -167,7 +184,24 @@ ob_start();
             background-image: radial-gradient(#222 1px, transparent 1px);
             background-size: 4px 4px;
         }
-        body { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+        body { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+        
+        .layout { 
+            display: grid; 
+            grid-template-columns: 1fr 320px; 
+            gap: 2rem; 
+            align-items: start; 
+        }
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+        
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
         
         header { 
             background: var(--surface);
@@ -241,7 +275,47 @@ ob_start();
             border-radius: 8px;
             box-shadow: 4px 4px 0px #000;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
         }
+        .card > p, .card > div[style*="-webkit-box"] { flex: 1; }
+        
+        .sidebar {
+            background: var(--surface);
+            border: 4px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 4px 4px 0px #000;
+            position: sticky;
+            top: 2rem;
+        }
+        .sidebar h3 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-family: 'VT323', monospace;
+            color: var(--primary);
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+        }
+        .sidebar li { margin-bottom: 0.8rem; }
+        .sidebar a {
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            color: var(--text);
+            border: none;
+        }
+        .sidebar a:hover {
+            color: var(--secondary);
+            text-shadow: 0 0 5px var(--secondary);
+        }
+        
         .meta { 
             font-family: 'VT323', monospace; 
             font-size: 1.2rem; 
@@ -291,14 +365,14 @@ ob_start();
         <a href="/" class="logo">My Modern Blog</a>
         <nav>
             <ul>
-                <li><a href="/" class="<?= $route === 'home' ? 'active' : '' ?>">Home</a></li>
+                <li><a href="/" class="<?= $route === 'home' ? 'active' : '' ?>">Inicio</a></li>
                 <?php foreach ($navTree as $sec => $subs): ?>
                     <li>
-                        <a href="/<?= e($sec) ?>" class="<?= ($matchedSection === $sec) ? 'active' : '' ?>"><?= e(ucfirst($sec)) ?></a>
+                        <a href="/<?= e($sec) ?>" class="<?= ($matchedSection === $sec) ? 'active' : '' ?>"><?= e(translate_cat($sec)) ?></a>
                         <?php if (!empty($subs)): ?>
                             <div class="nav-subs">
                                 <?php foreach ($subs as $sub): ?>
-                                    <a href="/<?= e($sec) ?>/<?= e($sub) ?>"><?= e(ucfirst($sub)) ?></a>
+                                    <a href="/<?= e($sec) ?>/<?= e($sub) ?>"><?= e(translate_cat($sub)) ?></a>
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
@@ -307,6 +381,7 @@ ob_start();
             </ul>
         </nav>
     </header>
+    <div class="layout">
     <main>
 <?php
 
@@ -317,12 +392,12 @@ function render_post_card($post) {
     }
     echo "<h2><a href='{$post['url']}'>".e($post['title'])."</a></h2>";
     
-    $catDisplay = "<a href='/".urlencode($post['section'])."'>".e(ucfirst($post['section']))."</a>";
+    $catDisplay = "<a href='/".urlencode($post['section'])."'>".e(translate_cat($post['section']))."</a>";
     if ($post['subsection']) {
-        $catDisplay .= " / <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(ucfirst($post['subsection']))."</a>";
+        $catDisplay .= " / <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
     }
     
-    echo "<div class='meta'>In {$catDisplay} on ".e($post['date'])."</div>";
+    echo "<div class='meta'>En {$catDisplay} el ".e($post['date'])."</div>";
     
     if ($post['excerpt']) {
         echo "<p style='margin-bottom: 1rem;'>".e($post['excerpt'])."</p>";
@@ -331,60 +406,81 @@ function render_post_card($post) {
         echo strip_tags($post['content'], '<p><br><b><i><strong><em>');
         echo "</div>";
     }
-    echo "<a href='{$post['url']}' style='font-family: \"VT323\", monospace; font-size: 1.4rem;'>Read more &rarr;</a>";
+    echo "<a href='{$post['url']}' style='font-family: \"VT323\", monospace; font-size: 1.4rem;'>Leer más &rarr;</a>";
     echo "</div>";
 }
 
 if ($route === 'home') {
-    echo "<h1>Latest Posts</h1>";
-    if (empty($allPosts)) echo "<p>No posts yet.</p>";
+    echo "<h1>Últimas publicaciones</h1>";
+    if (empty($allPosts)) echo "<p>Aún no hay publicaciones.</p>";
+    echo "<div class='posts-grid'>";
     foreach ($allPosts as $post) {
         render_post_card($post);
     }
+    echo "</div>";
 } elseif ($route === 'post') {
     $post = $matchedPost;
     
-    $bc = "<a href='/".urlencode($post['section'])."'>".e(ucfirst($post['section']))."</a>";
+    $bc = "<a href='/".urlencode($post['section'])."'>".e(translate_cat($post['section']))."</a>";
     if ($post['subsection']) {
-        $bc .= " > <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(ucfirst($post['subsection']))."</a>";
+        $bc .= " > <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
     }
     
-    echo "<div class='breadcrumbs'><a href='/'>Home</a> > {$bc} > " . e($post['title']) . "</div>";
+    echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > {$bc} > " . e($post['title']) . "</div>";
     echo "<div class='card'>";
     if ($post['featured_image']) {
         echo "<img src='".e($post['featured_image'])."' style='width: 100%; max-height: 400px; object-fit: cover; margin-bottom: 2rem;' />";
     }
     echo "<h1>".e($post['title'])."</h1>";
-    echo "<div class='meta'>In {$bc} on ".e($post['date'])."</div>";
+    echo "<div class='meta'>En {$bc} el ".e($post['date'])."</div>";
     echo "<div class='post-content'>".$post['content']."</div>";
     echo "</div>";
 } elseif ($route === 'section') {
-    echo "<div class='breadcrumbs'><a href='/'>Home</a> > " . e(ucfirst($matchedSection)) . "</div>";
-    echo "<h1>".e(ucfirst($matchedSection))."</h1>";
+    echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > " . e(translate_cat($matchedSection)) . "</div>";
+    echo "<h1>".e(translate_cat($matchedSection))."</h1>";
     $hasPosts = false;
+    echo "<div class='posts-grid'>";
     foreach ($allPosts as $post) {
         if ($post['section'] === $matchedSection) {
             $hasPosts = true;
             render_post_card($post);
         }
     }
-    if (!$hasPosts) echo "<p>No posts in this section.</p>";
+    echo "</div>";
+    if (!$hasPosts) echo "<p>No hay publicaciones en esta sección.</p>";
 } elseif ($route === 'subsection') {
-    echo "<div class='breadcrumbs'><a href='/'>Home</a> > <a href='/".urlencode($matchedSection)."'>" . e(ucfirst($matchedSection)) . "</a> > " . e(ucfirst($matchedSubsection)) . "</div>";
-    echo "<h1>".e(ucfirst($matchedSubsection))." <small style='font-size:1rem;font-weight:normal;color:#666;'>in ".e(ucfirst($matchedSection))."</small></h1>";
+    echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > <a href='/".urlencode($matchedSection)."'>" . e(translate_cat($matchedSection)) . "</a> > " . e(translate_cat($matchedSubsection)) . "</div>";
+    echo "<h1>".e(translate_cat($matchedSubsection))." <small style='font-size:1rem;font-weight:normal;color:#666;'>in ".e(translate_cat($matchedSection))."</small></h1>";
     $hasPosts = false;
+    echo "<div class='posts-grid'>";
     foreach ($allPosts as $post) {
         if ($post['section'] === $matchedSection && $post['subsection'] === $matchedSubsection) {
             $hasPosts = true;
             render_post_card($post);
         }
     }
-    if (!$hasPosts) echo "<p>No posts in this subsection.</p>";
+    echo "</div>";
+    if (!$hasPosts) echo "<p>No hay publicaciones en esta subsección.</p>";
 } else {
     echo "<h1>404 Not Found</h1>";
-    echo "<p>The page you requested could not be found.</p>";
+    echo "<p>La página que solicitaste no pudo ser encontrada.</p>";
 }
 ?>
     </main>
+    <aside class="sidebar">
+        <h3>Categorías</h3>
+        <ul>
+            <?php foreach ($navTree as $sec => $subs): ?>
+                <li><a href="/<?= urlencode($sec) ?>">&gt; <?= e(translate_cat($sec)) ?></a></li>
+            <?php endforeach; ?>
+        </ul>
+        <h3>Últimas</h3>
+        <ul>
+            <?php $count=0; foreach ($allPosts as $p): if($count++>=5) break; ?>
+                <li><a href="<?= $p['url'] ?>">&gt; <?= e($p['title']) ?></a></li>
+            <?php endforeach; ?>
+        </ul>
+    </aside>
+    </div>
 </body>
 </html>
