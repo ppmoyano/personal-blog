@@ -2,6 +2,7 @@
 title: Treintena a San José
 date: 2026-07-03T20:11:00.000+02:00
 section: spirituality
+subsection: ""
 featured_image: https://www.aciprensa.com/imagespp/san-jose-jeffrey-pioquinto-sj-.jpg
 excerpt: "Miles de imagenes de San José dormido se vendieron luego de que el
   papa Francisco contara que ponia las intenciones que mas le preocupaban de la
