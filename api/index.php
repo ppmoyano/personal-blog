@@ -2,6 +2,7 @@
 require_once __DIR__ . '/Parsedown.php';
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = urldecode($path);
 
 if (php_sapi_name() === 'cli-server' && preg_match('/\.(css|js|png|jpg|jpeg|gif)$/', $path)) {
     return false;
