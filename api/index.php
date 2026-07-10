@@ -8,6 +8,29 @@ if (php_sapi_name() === 'cli-server' && preg_match('/\.(css|js|png|jpg|jpeg|gif)
     return false;
 }
 
+if (strpos($path, '/content/files/') === 0) {
+    $filePath = realpath(__DIR__ . '/..' . $path);
+    $allowedDir = realpath(__DIR__ . '/../content/files');
+    if ($filePath && $allowedDir && strpos($filePath, $allowedDir) === 0 && is_file($filePath)) {
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+        $mimeTypes = [
+            'pdf'  => 'application/pdf',
+            'png'  => 'image/png',
+            'jpg'  => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif'  => 'image/gif',
+            'svg'  => 'image/svg+xml',
+            'txt'  => 'text/plain',
+            'zip'  => 'application/zip',
+        ];
+        $contentType = $mimeTypes[strtolower($ext)] ?? 'application/octet-stream';
+        header('Content-Type: ' . $contentType);
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit;
+    }
+}
+
 if ($path === '/admin/config.yml' || $path === '/config.yml') {
     header('Content-Type: application/x-yaml');
     echo file_get_contents(__DIR__ . '/../admin/config.yml');
