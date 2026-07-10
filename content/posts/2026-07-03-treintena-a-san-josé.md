@@ -23,4 +23,4 @@ Ha intercedido para que consiguiéramos un alquiler BBB (bueno, bonito y barato)
 
 Uf, a medida que voy contando más cosas, se me vienen más a la mente, y más agradecido estoy por haber descubierto esto. Así que lo mejor que puedo hacer es compartirlo. Ahora debo tener como seis papelitos debajo del San José dormido; ya les contaré cómo interviene por estas intenciones.
 
-Aquí tienen la Treintena a San José. Espero que interceda por ustedes y por sus amigos.
+Aquí tienen la [Treintena a San José](/content/files/Treintena-San-Jose.pdf). Espero que interceda por ustedes y por sus amigos.
