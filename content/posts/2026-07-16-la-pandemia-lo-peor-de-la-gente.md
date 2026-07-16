@@ -3,7 +3,7 @@ title: La pandemia, lo peor de la gente.
 date: 2026-07-16T12:10:00.000+02:00
 section: life
 subsection: anecdotes
-featured_image: https://github.com/ppmoyano/ppmoyano.github.io/blob/main/images/headers/pandemia_post-title.jpg
+featured_image: https://i.guim.co.uk/img/media/6c974f0bdb035aba68f5fed74ea61f2e3e6ab3f4/0_267_1408_845/master/1408.jpg
 excerpt: Casi todos hemos vivido la pandemia. Algunos nunca pasaron por el
   confinamiento, y en otros lugares se volvió eterno. Algunos perdieron seres
   queridos; otros siguen diciendo que el COVID no existe. Para algunos, ese
