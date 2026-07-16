@@ -30,6 +30,7 @@ collections:
           - {label: "IT", value: "programming"}
           - {label: "Espiritualidad", value: "spirituality"}
           - {label: "Familia", value: "family"}
+          - {label: "Vida", value: "life"}
         required: true
       - label: "Subsection"
         name: "subsection"
