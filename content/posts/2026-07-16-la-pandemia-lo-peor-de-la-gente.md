@@ -41,8 +41,6 @@ La primera situacion que quiero contar fué en pleno lock down en Argentina. No 
 >
 > Oficial: - suspiro -   
 
-
-
 Cuestion, despues de la charla se fueron los policias. Al ratito se fue la gente de la fiesta. A las 6 de la mañana, todavia de noche. Gaston abrio la puerta de su departamento y puso musica a todo volumen. Y nadie dijo nada.  
 
 Al mes siguiente, la policia volvio al edificio, fueron a allanar el departamento de Gaston, pero el ya no estaba y nunca mas lo vi.
@@ -74,3 +72,7 @@ Lo que mas me molesto de toda esta situación, es que a los pocos meses, salio l
 **Y cuando creiamos que ya estabamos mucho mejor. Comenzo una guerra en otra parte del mundo.**  
 
 **El ser humano no ha aprendido nada.** *(Otra vez).*
+
+
+
+***<iframe width="560" height="315" src="https://www.youtube.com/embed/XSj61Ub0KUA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>***
