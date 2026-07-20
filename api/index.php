@@ -127,7 +127,10 @@ foreach ($allPosts as $p) {
     }
 }
 ksort($navTree);
-foreach ($navTree as &$subs) { sort($subs); }
+foreach ($navTree as $sec => $subs) { 
+    sort($subs); 
+    $navTree[$sec] = $subs;
+}
 
 // Routing logic
 $parts = explode('/', trim($path, '/'));
@@ -184,9 +187,8 @@ ob_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Modern Blog</title>
+    <title>My fake plastic blog</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root { 
             --bg: #111118; 
@@ -303,6 +305,8 @@ ob_start();
             flex-direction: column;
             height: 100%;
             box-sizing: border-box;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         .card > p, .card > div[style*="-webkit-box"] { flex: 1; }
         
@@ -350,15 +354,33 @@ ob_start();
         .meta a { color: var(--accent); border-bottom-color: var(--accent); }
         .meta a:hover { color: var(--secondary); }
         
+        /* Post Content Images */
         .post-content img { 
             max-width: 100%; 
+            max-height: 500px;
             height: auto; 
+            object-fit: cover;
             display: block; 
-            margin: 1.5rem 0; 
+            margin: 1.5rem auto; 
             border: 2px solid var(--border);
             border-radius: 4px;
+            box-shadow: 2px 2px 0px #000;
         }
         .post-content p { margin-bottom: 1.5rem; }
+        .post-content iframe,
+        .post-content video,
+        .post-content embed,
+        .post-content object {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            margin: 1.5rem auto;
+            display: block;
+            box-shadow: 2px 2px 0px #000;
+        }
         .post-content blockquote { 
             margin: 1.5rem 0; 
             padding: 1rem; 
@@ -366,6 +388,70 @@ ob_start();
             border-left: 4px solid var(--secondary); 
             color: #ddd; 
             font-style: italic;
+        }
+        
+        /* Post Header & Hero Image Styles */
+        .post-hero-wrapper {
+            width: 100%;
+            max-height: 380px;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border-radius: 6px;
+            border: 3px solid var(--border);
+            margin-bottom: 2rem;
+            background-color: #0b0b10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 0px #000;
+        }
+        .post-hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+        
+        /* Card Hero Image Styles */
+        .card-hero-wrapper {
+            display: block;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 4px;
+            border: 2px solid var(--border);
+            margin-bottom: 1rem;
+            background: #0b0b10;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .card-hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        .card-hero-wrapper:hover .card-hero-image {
+            transform: scale(1.04);
+        }
+        
+        @media (max-width: 900px) {
+            .post-hero-wrapper {
+                max-height: 280px;
+                aspect-ratio: 16 / 9;
+            }
+        }
+        @media (max-width: 600px) {
+            .post-hero-wrapper {
+                max-height: 200px;
+                margin-bottom: 1.5rem;
+                border-width: 2px;
+            }
+            .card-hero-wrapper {
+                height: 160px;
+            }
         }
         
         .breadcrumbs { 
@@ -386,7 +472,7 @@ ob_start();
 </head>
 <body>
     <header>
-        <a href="/" class="logo">My Modern Blog</a>
+        <a href="/" class="logo">My fake plastic blog</a>
         <nav>
             <ul>
                 <li><a href="/" class="<?= $route === 'home' ? 'active' : '' ?>">Inicio</a></li>
@@ -412,7 +498,7 @@ ob_start();
 function render_post_card($post) {
     echo "<div class='card'>";
     if ($post['featured_image']) {
-        echo "<a href='{$post['url']}'><img src='".e($post['featured_image'])."' style='width: 100%; max-height: 300px; object-fit: cover; margin-bottom: 1rem;' /></a>";
+        echo "<a href='{$post['url']}' class='card-hero-wrapper'><img src='".e($post['featured_image'])."' class='card-hero-image' alt='".e($post['title'])."' /></a>";
     }
     echo "<h2><a href='{$post['url']}'>".e($post['title'])."</a></h2>";
     
@@ -453,7 +539,7 @@ if ($route === 'home') {
     echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > {$bc} > " . e($post['title']) . "</div>";
     echo "<div class='card'>";
     if ($post['featured_image']) {
-        echo "<img src='".e($post['featured_image'])."' style='width: 100%; max-height: 400px; object-fit: cover; margin-bottom: 2rem;' />";
+        echo "<div class='post-hero-wrapper'><img src='".e($post['featured_image'])."' class='post-hero-image' alt='".e($post['title'])."' /></div>";
     }
     echo "<h1>".e($post['title'])."</h1>";
     echo "<div class='meta'>En {$bc} el ".e($post['date'])."</div>";
