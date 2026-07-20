@@ -37,6 +37,14 @@ Yo soy el que más va por Argentina. Desde siempre. En el Mundial 2014 le hicimo
 >
 > Amas los colores de argentina
 
-
-
 <iframe width="1071" height="803" src="https://www.youtube.com/embed/F_3c21e3b1A" title="Gol Argentino - (Colores Argentinos)  LA CANCION DEL MUNDIAL" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+
+## Actualización del Lunes
+
+Perdimos. España fue totalmente superior. El Dibu lo dio todo. Mis hijos siguen siendo campeones (solo cambian de selección). Me gustaron los titulares de los diarios argentinos, agradeciendo a la Scaloneta; no hay odio ni reclamos, muy distinto a otras veces.
+
+Y aquí en Barcelona he salido a hacer mi rutina diaria. Nadie me ha dicho nada, todo súper bien. Un día normal, quizás con los españoles un poco más felices, pero sin chistes ni burlas hacia este pobre argentino que perdió con su amado equipo. Es más, un compañero de trabajo dice que lo siente por mí.
+
+A esperar cuatro años más...
