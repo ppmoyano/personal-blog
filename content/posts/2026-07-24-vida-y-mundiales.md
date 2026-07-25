@@ -3,11 +3,10 @@ title: Vida y mundiales
 date: 2026-07-24T13:12:00.000+02:00
 section: life
 featured_image: https://library.sportingnews.com/styles/crop_style_16_9_desktop_webp/s3/2021-08/gabriel-batistuta-argentina-japan-1998-world-cup_1l2lm9mzcrn41tpuxexlonlci.jpg.webp?itok=xYvdUEau
-excerpt: >-
-  En la película dicen: ¿Cuántos Mundiales me quedan? ¿Cuatro? ¿Tres? Si tengo
+excerpt: "En la película dicen: ¿Cuántos Mundiales me quedan? ¿Cuatro? ¿Tres? Si tengo
   suerte... ¿cinco? La vida se mide en Mundiales.
 
-  Qué buena métrica para la vida: cómo cambia cada cuatro años. Así fue cambiando la mía...
+  Qué buena métrica para la vida: cómo cambia cada cuatro años. Así fue cambiando la mía..."
 draft: false
 ---
 En la película *El Bandido*, dirigida por Luciano Juncos, hay una frase que dicen en un momento:
