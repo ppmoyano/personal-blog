@@ -64,6 +64,24 @@ function translate_cat($slug) {
     return $map[strtolower($slug)] ?? ucfirst($slug);
 }
 
+function format_date_es($dateStr) {
+    if (empty($dateStr)) return '';
+    try {
+        $dt = new DateTime($dateStr);
+        $months = [
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+        $day = $dt->format('j');
+        $monthNum = (int)$dt->format('n');
+        $year = $dt->format('Y');
+        return $day . ' de ' . ($months[$monthNum] ?? '') . ' del ' . $year;
+    } catch (Exception $e) {
+        return $dateStr;
+    }
+}
+
 function get_all_posts() {
     $posts = [];
     $dir = __DIR__ . '/../content/posts';
@@ -507,7 +525,7 @@ function render_post_card($post) {
         $catDisplay .= " / <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
     }
     
-    echo "<div class='meta'>En {$catDisplay} el ".e($post['date'])."</div>";
+    echo "<div class='meta'>En {$catDisplay} el ".e(format_date_es($post['date']))."</div>";
     
     if ($post['excerpt']) {
         echo "<p style='margin-bottom: 1rem;'>".e($post['excerpt'])."</p>";
@@ -542,7 +560,7 @@ if ($route === 'home') {
         echo "<div class='post-hero-wrapper'><img src='".e($post['featured_image'])."' class='post-hero-image' alt='".e($post['title'])."' /></div>";
     }
     echo "<h1>".e($post['title'])."</h1>";
-    echo "<div class='meta'>En {$bc} el ".e($post['date'])."</div>";
+    echo "<div class='meta'>En {$bc} el ".e(format_date_es($post['date']))."</div>";
     echo "<div class='post-content'>".$post['content']."</div>";
     echo "</div>";
 } elseif ($route === 'section') {
