@@ -82,6 +82,51 @@ function format_date_es($dateStr) {
     }
 }
 
+function get_comments($slug) {
+    $supabaseUrl = getenv('SUPABASE_URL');
+    $supabaseKey = getenv('SUPABASE_KEY');
+    if (!$supabaseUrl || !$supabaseKey) return [];
+    $url = $supabaseUrl . '/rest/v1/comments?post_slug=eq.' . urlencode($slug) . '&approved=eq.true&order=created_at.asc&select=id,author_name,content,created_at';
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'apikey: ' . $supabaseKey,
+        'Authorization: Bearer ' . $supabaseKey,
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    return is_array($data) ? $data : [];
+}
+
+function save_comment($slug, $name, $email, $content) {
+    $supabaseUrl = getenv('SUPABASE_URL');
+    $supabaseKey = getenv('SUPABASE_KEY');
+    if (!$supabaseUrl || !$supabaseKey) return false;
+    $url = $supabaseUrl . '/rest/v1/comments';
+    $body = json_encode([
+        'post_slug' => $slug,
+        'author_name' => $name,
+        'author_email' => $email,
+        'content' => $content,
+    ]);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'apikey: ' . $supabaseKey,
+        'Authorization: Bearer ' . $supabaseKey,
+        'Content-Type: application/json',
+        'Prefer: return=minimal',
+    ]);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return $httpCode >= 200 && $httpCode < 300;
+}
+
 function get_all_posts() {
     $posts = [];
     $dir = __DIR__ . '/../content/posts';
@@ -194,6 +239,30 @@ if (empty($parts[0])) {
             $route = 'post';
             $matchedPost = $p;
             break;
+        }
+    }
+}
+
+// Handle comment form submission
+$commentSuccess = false;
+$commentError = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_content'])) {
+    $cSlug    = trim($_POST['post_slug'] ?? '');
+    $cName    = trim($_POST['author_name'] ?? '');
+    $cEmail   = trim($_POST['author_email'] ?? '');
+    $cContent = trim($_POST['comment_content'] ?? '');
+    if (empty($cName) || empty($cEmail) || empty($cContent)) {
+        $commentError = 'Por favor completá todos los campos.';
+    } elseif (!filter_var($cEmail, FILTER_VALIDATE_EMAIL)) {
+        $commentError = 'El email no es válido.';
+    } elseif (mb_strlen($cContent) < 3) {
+        $commentError = 'El comentario es demasiado corto.';
+    } else {
+        if (save_comment($cSlug, $cName, $cEmail, $cContent)) {
+            header('Location: ' . strtok($_SERVER['REQUEST_URI'], '?') . '?commented=1');
+            exit;
+        } else {
+            $commentError = 'Hubo un error al guardar el comentario. Intentá de nuevo.';
         }
     }
 }
@@ -486,6 +555,127 @@ ob_start();
         }
         .breadcrumbs a { color: var(--text); border: none; }
         .breadcrumbs a:hover { color: var(--secondary); }
+        
+        /* Comments Section */
+        .comments-section {
+            margin-top: 2.5rem;
+            border-top: 3px solid var(--border);
+            padding-top: 2rem;
+        }
+        .comments-title {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 8px var(--secondary);
+        }
+        .comment-item {
+            background: rgba(0,0,0,0.25);
+            border: 2px solid var(--border);
+            border-left: 4px solid var(--secondary);
+            border-radius: 4px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .comment-meta {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            color: var(--secondary);
+            margin-bottom: 0.4rem;
+        }
+        .comment-author { color: var(--primary); font-weight: bold; }
+        .comment-date { color: #888; margin-left: 0.5rem; }
+        .comment-body { font-size: 0.95rem; color: var(--text); line-height: 1.6; }
+        .no-comments {
+            font-family: 'VT323', monospace;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        /* Comment Form */
+        .comment-form-wrapper {
+            margin-top: 2rem;
+            background: rgba(0,0,0,0.2);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
+        .comment-form-title {
+            font-family: 'VT323', monospace;
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+        }
+        .comment-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 600px) {
+            .comment-form-row { grid-template-columns: 1fr; }
+        }
+        .comment-form input,
+        .comment-form textarea {
+            width: 100%;
+            background: #0d0d14;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            padding: 0.6rem 0.8rem;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .comment-form input:focus,
+        .comment-form textarea:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 6px rgba(57,255,20,0.2);
+        }
+        .comment-form textarea { min-height: 110px; resize: vertical; }
+        .comment-form input::placeholder,
+        .comment-form textarea::placeholder { color: #555; }
+        .comment-submit {
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            background: transparent;
+            border: 3px solid var(--secondary);
+            color: var(--secondary);
+            padding: 0.4rem 1.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 0.8rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .comment-submit:hover {
+            background: var(--secondary);
+            color: #000;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+        .comment-alert-success {
+            background: rgba(57,255,20,0.1);
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .comment-alert-error {
+            background: rgba(255,64,129,0.1);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -562,7 +752,49 @@ if ($route === 'home') {
     echo "<h1>".e($post['title'])."</h1>";
     echo "<div class='meta'>En {$bc} el ".e(format_date_es($post['date']))."</div>";
     echo "<div class='post-content'>".$post['content']."</div>";
+    
+    // --- Comments Section ---
+    $comments = get_comments($post['id']);
+    $commentCount = count($comments);
+    echo "<div class='comments-section'>";
+    echo "<div class='comments-title'>&#128172; COMENTARIOS ({$commentCount})</div>";
+    
+    if (isset($_GET['commented'])) {
+        echo "<div class='comment-alert-success'>&#10003; ¡Comentario publicado! Gracias por participar.</div>";
+    }
+    if ($commentError) {
+        echo "<div class='comment-alert-error'>&#9888; " . e($commentError) . "</div>";
+    }
+    
+    if (empty($comments)) {
+        echo "<div class='no-comments'>&gt; Aún no hay comentarios. ¡Sé el primero!</div>";
+    } else {
+        foreach ($comments as $c) {
+            $cDate = format_date_es($c['created_at'] ?? '');
+            echo "<div class='comment-item'>";
+            echo "<div class='comment-meta'><span class='comment-author'>&gt; " . e($c['author_name']) . "</span><span class='comment-date'> &bull; " . e($cDate) . "</span></div>";
+            echo "<div class='comment-body'>" . nl2br(e($c['content'])) . "</div>";
+            echo "</div>";
+        }
+    }
+    
+    // Comment form
+    $postUrl = strtok($_SERVER['REQUEST_URI'], '?');
+    echo "<div class='comment-form-wrapper'>";
+    echo "<div class='comment-form-title'>&gt;_ DEJÁ TU COMENTARIO</div>";
+    echo "<form class='comment-form' method='POST' action='" . e($postUrl) . "'>";
+    echo "<input type='hidden' name='post_slug' value='" . e($post['id']) . "'>";
+    echo "<div class='comment-form-row'>";
+    echo "<input type='text' name='author_name' placeholder='Tu alias o nombre' maxlength='80' required value='" . e($_POST['author_name'] ?? '') . "'>";
+    echo "<input type='email' name='author_email' placeholder='Tu email (no se publica)' maxlength='120' required value='" . e($_POST['author_email'] ?? '') . "'>";
     echo "</div>";
+    echo "<textarea name='comment_content' placeholder='Escribí tu comentario aquí...' maxlength='2000' required>" . e($_POST['comment_content'] ?? '') . "</textarea>";
+    echo "<br><button type='submit' class='comment-submit'>ENVIAR &rarr;</button>";
+    echo "</form>";
+    echo "</div>";
+    echo "</div>"; // end comments-section
+    
+    echo "</div>"; // end card
 } elseif ($route === 'section') {
     echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > " . e(translate_cat($matchedSection)) . "</div>";
     echo "<h1>".e(translate_cat($matchedSection))."</h1>";
