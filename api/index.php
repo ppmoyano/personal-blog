@@ -674,6 +674,12 @@ ob_start();
             border-radius: 4px;
             margin-bottom: 1rem;
         }
+        .comment-disclaimer {
+            font-size: 0.8rem;
+            color: #666;
+            margin: 0.8rem 0 1rem;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -780,14 +786,15 @@ if ($route === 'home') {
     $postUrl = strtok($_SERVER['REQUEST_URI'], '?');
     echo "<div class='comment-form-wrapper'>";
     echo "<div class='comment-form-title'>&gt;_ DEJÁ TU COMENTARIO</div>";
-    echo "<form class='comment-form' method='POST' action='" . e($postUrl) . "'>";
+    echo "<form class='comment-form' id='comment-form' method='POST' action='" . e($postUrl) . "'>";
     echo "<input type='hidden' name='post_slug' value='" . e($post['id']) . "'>";
     echo "<div class='comment-form-row'>";
-    echo "<input type='text' name='author_name' placeholder='Tu alias o nombre' maxlength='80' required value='" . e($_POST['author_name'] ?? '') . "'>";
-    echo "<input type='email' name='author_email' placeholder='Tu email (no se publica)' maxlength='120' required value='" . e($_POST['author_email'] ?? '') . "'>";
+    echo "<input type='text' id='cf-name' name='author_name' placeholder='Tu alias o nombre' maxlength='80' required value='" . e($_POST['author_name'] ?? '') . "'>";
+    echo "<input type='email' id='cf-email' name='author_email' placeholder='Tu email (no se publica)' maxlength='120' required value='" . e($_POST['author_email'] ?? '') . "'>";
     echo "</div>";
     echo "<textarea name='comment_content' placeholder='Escribí tu comentario aquí...' maxlength='2000' required>" . e($_POST['comment_content'] ?? '') . "</textarea>";
-    echo "<br><button type='submit' class='comment-submit'>ENVIAR &rarr;</button>";
+    echo "<p class='comment-disclaimer'>&#9432; Dejando un comentario aceptás recibir un email cada vez que haya un nuevo post.</p>";
+    echo "<button type='submit' class='comment-submit'>ENVIAR &rarr;</button>";
     echo "</form>";
     echo "</div>";
     echo "</div>"; // end comments-section
@@ -841,4 +848,23 @@ if ($route === 'home') {
     </aside>
     </div>
 </body>
+<script>
+// Persist alias + email in localStorage so user doesn't have to retype
+(function() {
+    var nameInput  = document.getElementById('cf-name');
+    var emailInput = document.getElementById('cf-email');
+    var form       = document.getElementById('comment-form');
+    if (!nameInput || !emailInput || !form) return;
+
+    // Pre-fill from storage if the fields are empty (no server-side value)
+    if (!nameInput.value) nameInput.value  = localStorage.getItem('cf_name')  || '';
+    if (!emailInput.value) emailInput.value = localStorage.getItem('cf_email') || '';
+
+    // Save on submit
+    form.addEventListener('submit', function() {
+        if (nameInput.value)  localStorage.setItem('cf_name',  nameInput.value);
+        if (emailInput.value) localStorage.setItem('cf_email', emailInput.value);
+    });
+})();
+</script>
 </html>
