@@ -99,6 +99,28 @@ function get_comments($slug) {
     return is_array($data) ? $data : [];
 }
 
+function check_alias_owner($name, $email) {
+    $supabaseUrl = getenv('SUPABASE_URL');
+    $supabaseKey = getenv('SUPABASE_KEY');
+    if (!$supabaseUrl || !$supabaseKey) return true;
+    $url = $supabaseUrl . '/rest/v1/comments?author_name=ilike.' . rawurlencode($name) . '&select=author_email&limit=1';
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'apikey: ' . $supabaseKey,
+        'Authorization: Bearer ' . $supabaseKey,
+    ]);
+    $response = curl_exec($ch);
+    $data = json_decode($response, true);
+    if (is_array($data) && !empty($data)) {
+        $existingEmail = $data[0]['author_email'] ?? '';
+        if (strtolower(trim($existingEmail)) !== strtolower(trim($email))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function save_comment($slug, $name, $email, $content) {
     $supabaseUrl = getenv('SUPABASE_URL');
     $supabaseKey = getenv('SUPABASE_KEY');
@@ -255,6 +277,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment_content'])) {
         $commentError = 'El email no es válido.';
     } elseif (mb_strlen($cContent) < 3) {
         $commentError = 'El comentario es demasiado corto.';
+    } elseif (!check_alias_owner($cName, $cEmail)) {
+        $commentError = 'El alias "' . $cName . '" ya pertenece a otro usuario. Si es tu alias, ingresá el email registrado.';
     } else {
         if (save_comment($cSlug, $cName, $cEmail, $cContent)) {
             header('Location: ' . strtok($_SERVER['REQUEST_URI'], '?') . '?commented=1');
