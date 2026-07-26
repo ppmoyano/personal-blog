@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Buffer all output so warnings don't break header() redirects
 require_once __DIR__ . '/Parsedown.php';
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -94,7 +95,6 @@ function get_comments($slug) {
         'Authorization: Bearer ' . $supabaseKey,
     ]);
     $response = curl_exec($ch);
-    curl_close($ch);
     $data = json_decode($response, true);
     return is_array($data) ? $data : [];
 }
@@ -120,10 +120,8 @@ function save_comment($slug, $name, $email, $content) {
         'Content-Type: application/json',
         'Prefer: return=minimal',
     ]);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
     return $httpCode >= 200 && $httpCode < 300;
 }
 
