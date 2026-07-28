@@ -43,6 +43,7 @@ collections:
           - {label: "Anécdotas", value: "anecdotes"}
           - {label: "Viajes", value: "travel"}
           - {label: "Vida", value: "life"}
+          - {label: "Discos", value: "discos"}
         required: false
       - {label: "Featured Image URL", name: "featured_image", widget: "string", required: false, hint: "Paste an external image URL"}
       - {label: "Excerpt", name: "excerpt", widget: "text", required: false, hint: "Short summary for the homepage"}
