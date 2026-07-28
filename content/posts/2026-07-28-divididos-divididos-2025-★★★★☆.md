@@ -18,7 +18,7 @@ Así que la sección de discos la empiezo con ellos, para poner algo “nuevo”
 2. **El sonido.** Estamos en la era de la IA. Todo es IA. La IA me corrige a mí los errores ortográficos, pero a otros les crea canciones de principio a fin. El audio de este disco es único, es de ellos; y además se escuchan pequeños desfaces, propios de la edad, de lo humano, de cómo tiene que ser. Y eso le da todavía más valor.
 3. **La batería.** Todos los fills del disco son excelentes. Logra eso que te da ganas de tocarlos en el aire. Los seisillos, tresillos, explosivos. Las campanas en el ride. El bombo en negras cuando tiene que ir. Hablando de IA, una IA no podría arrancar canciones de esta manera, como “Doña Red” o como comienza y termina “El Faro”.
 4. **Las mezclas.** Tiene temas súper power, que bajan a un estilo psicodélico beatle; partes C, riffs y arreglos que están muy buenos para aprender o enseñar. También bajan a estilos como “El Arriero” en “Mundo Ganado” (acá se escuchan unas caídas desfasadas; no cualquiera puede tocar un tema así, ¡muy bien, Divididos!). Y el tema de cierre… perfecto. Es un concepto, es un libro, es una película. Hay que escucharlo de principio a fin.
-5. Momentos en los que usaría estas canciones:
+5. **Momentos** en los que usaría estas canciones:
 
 * **Funeral → “Mundo Ganado”.** “Yo te espero en un valle de almas del fuego sagrado ancestral”.
   Esta canción también se podría haber usado en la saga del pistolero de S. K.
@@ -39,3 +39,10 @@ Así que la sección de discos la empiezo con ellos, para poner algo “nuevo”
    “Revienta el mi mayor.”
 
    “Con el humor logré lo imposible: poner a todos a bostezar.”
+
+   \
+   Para mí es un discazo: le doy 4 estrellas. Te lo comparto así también vos lo escuchás.
+
+
+
+   <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/6e8Q3SKXYEfJTKQmHp715l?utm_source=generator&si=bfba2bfd3c354858" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
