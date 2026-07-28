@@ -6,7 +6,7 @@ subsection: discos
 featured_image: https://i.ytimg.com/vi/bJ2FX-XLrO0/sddefault.jpg
 excerpt: Abrimos este espacio en el post analizando discos, empezamos con el
   último disco de Divididos.
-draft: true
+draft: false
 ---
 Primero que nada, no me considero un gran fanático de Divididos. Pero sí puedo decir que en mis discos compilados siempre hubo alguna canción de ellos —sobre todo los clásicos, los de la tele; quizá la más rara era la de “El Arriero”—. En un momento me obligué a escucharlos más por Catriel, el baterista, y hace unos años los vi en vivo en Barcelona… y me volaron la cabeza.
 
