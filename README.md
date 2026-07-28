@@ -1,12 +1,37 @@
 # Personal Blog (Decap CMS & Vercel)
 
-A fully serverless, Git-backed personal blog built with PHP and Decap CMS (formerly Netlify CMS). This project is specifically designed to run on Vercel without needing any database or persistent storage environment.
+A fully serverless, Git-backed personal blog built with PHP and Decap CMS (formerly Netlify CMS). This project is specifically designed to run on Vercel without needing any persistent storage environment for the posts, while using Supabase to power the native comment system.
 
 ## 🚀 Architecture Overview
 This blog operates as a **Git-based CMS**:
-- **No Database**: All content is stored directly in the GitHub repository as Markdown files inside the `content/posts/` directory.
+- **No Database for Posts**: All content is stored directly in the GitHub repository as Markdown files inside the `content/posts/` directory.
+- **Supabase for Comments**: A PostgreSQL database on Supabase is used to store and retrieve user comments via REST API.
 - **Vercel Native**: Because Vercel's functions are read-only, we use Decap CMS to authenticate via GitHub and push commits directly to your repository!
 - **Auto Deployments**: When you create or edit a post via the `/admin` panel, the GitHub API commit instantly triggers a new Vercel deployment, seamlessly rebuilding your live site.
+
+---
+
+## 🗄️ Database Setup (Supabase for Comments)
+
+To enable the comment system, you need a free [Supabase](https://supabase.com/) project.
+
+1. Create a new project in Supabase.
+2. Go to the **SQL Editor** and run the following query to create the `comments` table:
+
+```sql
+CREATE TABLE comments (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    post_slug TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_email TEXT NOT NULL,
+    content TEXT NOT NULL,
+    approved BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+3. Go to **Project Settings > API** and copy your **Project URL** and **anon public key**.
+4. You will need to use these as Environment Variables (see local setup and deployment steps).
 
 ---
 
@@ -20,8 +45,10 @@ To run this project locally, you only need PHP installed on your machine.
    cd personal-blog
    ```
 
-2. **Start the PHP built-in server (specifying the router file):**
+2. **Start the PHP built-in server (specifying the router file & env vars):**
    ```bash
+   SUPABASE_URL="https://your-project.supabase.co" \
+   SUPABASE_KEY="your-anon-public-key" \
    php -S 127.0.0.1:8000 -t . api/index.php
    ```
 
@@ -48,7 +75,10 @@ Before pushing to GitHub, you must update the Decap CMS configuration to point t
 1. Log into [Vercel](https://vercel.com) and click **"Add New Project"**.
 2. Import your GitHub repository.
 3. **Important**: Leave the Build Command and Output Directory fields **empty** (or default).
-4. Click **Deploy**. Vercel will automatically read `vercel.json`, download the `vercel-php` runtime, and deploy your site.
+4. **Environment Variables**: Add your Supabase credentials:
+   - `SUPABASE_URL`: Your Supabase Project URL
+   - `SUPABASE_KEY`: Your Supabase anon public key
+5. Click **Deploy**. Vercel will automatically read `vercel.json`, download the `vercel-php` runtime, and deploy your site.
 
 ### Step 3: Setup GitHub OAuth Authentication
 Because you are deploying on Vercel (not Netlify), Decap CMS requires a way to authenticate with GitHub securely to commit files. You need to set up an OAuth application.
