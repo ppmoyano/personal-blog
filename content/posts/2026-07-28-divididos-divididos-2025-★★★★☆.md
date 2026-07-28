@@ -2,6 +2,7 @@
 title: Divididos - Divididos (2025) - ★★★★☆
 date: 2026-07-28T06:34:00.000+02:00
 section: music
+subsection: discos
 featured_image: https://i.ytimg.com/vi/bJ2FX-XLrO0/sddefault.jpg
 excerpt: Abrimos este espacio en el post analizando discos, empezamos con el
   último disco de Divididos.
