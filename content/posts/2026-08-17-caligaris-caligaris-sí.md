@@ -1,5 +1,5 @@
 ---
-title: "Caligaris: Caligaris Sí - (2026) - ★★★★☆"
+title: "Caligaris: Caligaris Sí - (2026)"
 date: 2026-08-17T09:07:00.000+02:00
 section: music
 subsection: discos
