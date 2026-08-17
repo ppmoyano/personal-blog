@@ -1,5 +1,5 @@
 ---
-title: Divididos - Divididos (2025) - ★★★★☆
+title: Divididos - Divididos (2025)
 date: 2026-07-28T06:34:00.000+02:00
 section: music
 subsection: discos
@@ -41,8 +41,4 @@ Así que la sección de discos la empiezo con ellos, para poner algo “nuevo”
    “Con el humor logré lo imposible: poner a todos a bostezar.”
 
    \
-   Para mí es un discazo: le doy 4 estrellas. Te lo comparto así también vos lo escuchás.
-
-
-
-   <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/album/6e8Q3SKXYEfJTKQmHp715l?utm_source=generator&si=bfba2bfd3c354858" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+   Para mí es un discazo. Te lo comparto así también vos lo escuchás.
