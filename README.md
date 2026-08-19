@@ -116,8 +116,11 @@ Don't worry—you don't have to code this! You can clone and deploy a free, pre-
 
 ---
 
-## 📝 Writing Content
+## 📝 Writing & Previewing Content
 Once deployed, simply navigate to `https://your-vercel-deployment-url.vercel.app/admin`. 
 - Click **Login with GitHub**.
-- You will be taken to a beautiful, visual WYSIWYG editor where you can write Markdown posts.
-- **Images**: Since Vercel is serverless, local image uploads are disabled. When inserting an image, simply paste an external URL (from Imgur, AWS, Cloudinary, etc.) into the "Featured Image URL" field or directly into the Markdown body.
+- You will be taken to a visual editor where you can write Markdown posts.
+- **Drafts**: You can save posts with the draft option turned on (`draft: true`).
+  - Public visitors at `/` will **only** see published posts (`draft: false`).
+  - You can view all posts (including drafts) by visiting **`/draft`**. Draft posts will be clearly labeled with a `BORRADOR` badge and a warning banner will appear.
+- **Images**: When inserting an image, paste an external URL (from Imgur, AWS, Cloudinary, etc.) into the "Featured Image URL" field or directly into the Markdown body.

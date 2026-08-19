@@ -147,7 +147,7 @@ function save_comment($slug, $name, $email, $content) {
     return $httpCode >= 200 && $httpCode < 300;
 }
 
-function get_all_posts() {
+function get_all_posts($includeDrafts = false) {
     $posts = [];
     $dir = __DIR__ . '/../content/posts';
     if (!is_dir($dir)) return [];
@@ -171,13 +171,16 @@ function get_all_posts() {
             }
         }
         
-        if (isset($meta['draft']) && strtolower($meta['draft']) === 'true') {
-            continue; // Skip drafts
+        $isDraft = isset($meta['draft']) && strtolower($meta['draft']) === 'true';
+        if ($isDraft && !$includeDrafts) {
+            continue; // Skip drafts if not requested
         }
         
         $section = strtolower(trim($meta['section'] ?? 'general'));
         $subsection = strtolower(trim($meta['subsection'] ?? ''));
         if ($subsection === '""' || $subsection === "''" || $subsection === 'null') $subsection = '';
+        
+        $urlPrefix = $includeDrafts ? '/draft' : '';
         
         $posts[] = [
             'id' => $slug,
@@ -185,11 +188,12 @@ function get_all_posts() {
             'date' => $meta['date'] ?? date('Y-m-d'),
             'section' => $section,
             'subsection' => $subsection,
+            'draft' => $isDraft,
             'featured_image' => $meta['featured_image'] ?? null,
             'excerpt' => $meta['excerpt'] ?? '',
             'content_raw' => $body,
             'content' => $parsedown->text($body),
-            'url' => '/' . $section . ($subsection ? '/' . $subsection : '') . '/' . $slug
+            'url' => $urlPrefix . '/' . $section . ($subsection ? '/' . $subsection : '') . '/' . $slug
         ];
     }
     
@@ -197,7 +201,15 @@ function get_all_posts() {
     return $posts;
 }
 
-$allPosts = get_all_posts();
+// Routing logic
+$parts = explode('/', trim($path, '/'));
+$isDraftMode = (isset($parts[0]) && strtolower($parts[0]) === 'draft');
+
+if ($isDraftMode) {
+    array_shift($parts); // Remove 'draft' from route handling
+}
+
+$allPosts = get_all_posts($isDraftMode);
 
 // Build navigation tree
 $navTree = [];
@@ -215,14 +227,12 @@ foreach ($navTree as $sec => $subs) {
     $navTree[$sec] = $subs;
 }
 
-// Routing logic
-$parts = explode('/', trim($path, '/'));
 $route = '404';
 $matchedPost = null;
 $matchedSection = null;
 $matchedSubsection = null;
 
-if (empty($parts[0])) {
+if (empty($parts) || (count($parts) === 1 && $parts[0] === '')) {
     $route = 'home';
 } elseif (count($parts) === 1) {
     // Could be a section
@@ -475,8 +485,7 @@ ob_start();
             border-radius: 4px;
             box-shadow: 2px 2px 0px #000;
         }
-        .post-content p { margin-bottom: 1.5rem; }
-        .post-content iframe,
+        .post-content iframe:not(.instagram-media-rendered),
         .post-content video,
         .post-content embed,
         .post-content object {
@@ -490,13 +499,24 @@ ob_start();
             display: block;
             box-shadow: 2px 2px 0px #000;
         }
-        .post-content blockquote { 
+        .post-content iframe.instagram-media-rendered {
+            border: none !important;
+            box-shadow: none !important;
+            aspect-ratio: unset !important;
+            max-height: none !important;
+        }
+        .post-content blockquote:not(.instagram-media) { 
             margin: 1.5rem 0; 
             padding: 1rem; 
             background: rgba(0,0,0,0.3);
             border-left: 4px solid var(--secondary); 
             color: #ddd; 
             font-style: italic;
+        }
+        .post-content blockquote.instagram-media {
+            margin: 1.5rem auto !important;
+            background: #FFF !important;
+            color: #000 !important;
         }
         
         /* Post Header & Hero Image Styles */
@@ -706,19 +726,25 @@ ob_start();
         }
     </style>
 </head>
+<?php $navPrefix = $isDraftMode ? '/draft' : ''; ?>
 <body>
+    <?php if ($isDraftMode): ?>
+        <div style="background: var(--accent); color: #fff; text-align: center; padding: 0.5rem; font-family: 'VT323', monospace; font-size: 1.4rem; font-weight: bold; letter-spacing: 1px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+            &#9888; MODO BORRADOR (/DRAFT) — Viendo todos los posts incluidos los borradores
+        </div>
+    <?php endif; ?>
     <header>
-        <a href="/" class="logo">My fake plastic blog</a>
+        <a href="<?= $navPrefix ?>/" class="logo">My fake plastic blog</a>
         <nav>
             <ul>
-                <li><a href="/" class="<?= $route === 'home' ? 'active' : '' ?>">Inicio</a></li>
+                <li><a href="<?= $navPrefix ?>/" class="<?= $route === 'home' ? 'active' : '' ?>">Inicio</a></li>
                 <?php foreach ($navTree as $sec => $subs): ?>
                     <li>
-                        <a href="/<?= e($sec) ?>" class="<?= ($matchedSection === $sec) ? 'active' : '' ?>"><?= e(translate_cat($sec)) ?></a>
+                        <a href="<?= $navPrefix ?>/<?= e($sec) ?>" class="<?= ($matchedSection === $sec) ? 'active' : '' ?>"><?= e(translate_cat($sec)) ?></a>
                         <?php if (!empty($subs)): ?>
                             <div class="nav-subs">
                                 <?php foreach ($subs as $sub): ?>
-                                    <a href="/<?= e($sec) ?>/<?= e($sub) ?>"><?= e(translate_cat($sub)) ?></a>
+                                    <a href="<?= $navPrefix ?>/<?= e($sec) ?>/<?= e($sub) ?>"><?= e(translate_cat($sub)) ?></a>
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
@@ -731,16 +757,19 @@ ob_start();
     <main>
 <?php
 
-function render_post_card($post) {
+function render_post_card($post, $isDraftMode = false) {
+    $navPrefix = $isDraftMode ? '/draft' : '';
     echo "<div class='card'>";
     if ($post['featured_image']) {
         echo "<a href='{$post['url']}' class='card-hero-wrapper'><img src='".e($post['featured_image'])."' class='card-hero-image' alt='".e($post['title'])."' /></a>";
     }
-    echo "<h2><a href='{$post['url']}'>".e($post['title'])."</a></h2>";
     
-    $catDisplay = "<a href='/".urlencode($post['section'])."'>".e(translate_cat($post['section']))."</a>";
+    $draftBadge = !empty($post['draft']) ? " <span style='background: var(--accent); color: #fff; font-family: \"VT323\", monospace; font-size: 1.2rem; padding: 2px 8px; border-radius: 4px; vertical-align: middle;'>BORRADOR</span>" : "";
+    echo "<h2><a href='{$post['url']}'>".e($post['title'])."</a>{$draftBadge}</h2>";
+    
+    $catDisplay = "<a href='{$navPrefix}/".urlencode($post['section'])."'>".e(translate_cat($post['section']))."</a>";
     if ($post['subsection']) {
-        $catDisplay .= " / <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
+        $catDisplay .= " / <a href='{$navPrefix}/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
     }
     
     echo "<div class='meta'>En {$catDisplay} el ".e(format_date_es($post['date']))."</div>";
@@ -761,23 +790,25 @@ if ($route === 'home') {
     if (empty($allPosts)) echo "<p>Aún no hay publicaciones.</p>";
     echo "<div class='posts-grid'>";
     foreach ($allPosts as $post) {
-        render_post_card($post);
+        render_post_card($post, $isDraftMode);
     }
     echo "</div>";
 } elseif ($route === 'post') {
     $post = $matchedPost;
     
-    $bc = "<a href='/".urlencode($post['section'])."'>".e(translate_cat($post['section']))."</a>";
+    $bc = "<a href='{$navPrefix}/".urlencode($post['section'])."'>".e(translate_cat($post['section']))."</a>";
     if ($post['subsection']) {
-        $bc .= " > <a href='/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
+        $bc .= " > <a href='{$navPrefix}/".urlencode($post['section'])."/".urlencode($post['subsection'])."'>".e(translate_cat($post['subsection']))."</a>";
     }
     
-    echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > {$bc} > " . e($post['title']) . "</div>";
+    $draftBadge = !empty($post['draft']) ? " <span style='background: var(--accent); color: #fff; font-family: \"VT323\", monospace; font-size: 1.6rem; padding: 2px 10px; border-radius: 4px; vertical-align: middle;'>BORRADOR</span>" : "";
+    
+    echo "<div class='breadcrumbs'><a href='{$navPrefix}/'>Inicio</a> > {$bc} > " . e($post['title']) . "</div>";
     echo "<div class='card'>";
     if ($post['featured_image']) {
         echo "<div class='post-hero-wrapper'><img src='".e($post['featured_image'])."' class='post-hero-image' alt='".e($post['title'])."' /></div>";
     }
-    echo "<h1>".e($post['title'])."</h1>";
+    echo "<h1>".e($post['title'])."{$draftBadge}</h1>";
     echo "<div class='meta'>En {$bc} el ".e(format_date_es($post['date']))."</div>";
     echo "<div class='post-content'>".$post['content']."</div>";
     
@@ -825,27 +856,27 @@ if ($route === 'home') {
     
     echo "</div>"; // end card
 } elseif ($route === 'section') {
-    echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > " . e(translate_cat($matchedSection)) . "</div>";
+    echo "<div class='breadcrumbs'><a href='{$navPrefix}/'>Inicio</a> > " . e(translate_cat($matchedSection)) . "</div>";
     echo "<h1>".e(translate_cat($matchedSection))."</h1>";
     $hasPosts = false;
     echo "<div class='posts-grid'>";
     foreach ($allPosts as $post) {
         if ($post['section'] === $matchedSection) {
             $hasPosts = true;
-            render_post_card($post);
+            render_post_card($post, $isDraftMode);
         }
     }
     echo "</div>";
     if (!$hasPosts) echo "<p>No hay publicaciones en esta sección.</p>";
 } elseif ($route === 'subsection') {
-    echo "<div class='breadcrumbs'><a href='/'>Inicio</a> > <a href='/".urlencode($matchedSection)."'>" . e(translate_cat($matchedSection)) . "</a> > " . e(translate_cat($matchedSubsection)) . "</div>";
+    echo "<div class='breadcrumbs'><a href='{$navPrefix}/'>Inicio</a> > <a href='{$navPrefix}/".urlencode($matchedSection)."'>" . e(translate_cat($matchedSection)) . "</a> > " . e(translate_cat($matchedSubsection)) . "</div>";
     echo "<h1>".e(translate_cat($matchedSubsection))." <small style='font-size:1rem;font-weight:normal;color:#666;'>in ".e(translate_cat($matchedSection))."</small></h1>";
     $hasPosts = false;
     echo "<div class='posts-grid'>";
     foreach ($allPosts as $post) {
         if ($post['section'] === $matchedSection && $post['subsection'] === $matchedSubsection) {
             $hasPosts = true;
-            render_post_card($post);
+            render_post_card($post, $isDraftMode);
         }
     }
     echo "</div>";
@@ -860,7 +891,7 @@ if ($route === 'home') {
         <h3>Categorías</h3>
         <ul>
             <?php foreach ($navTree as $sec => $subs): ?>
-                <li><a href="/<?= urlencode($sec) ?>">&gt; <?= e(translate_cat($sec)) ?></a></li>
+                <li><a href="<?= $navPrefix ?>/<?= urlencode($sec) ?>">&gt; <?= e(translate_cat($sec)) ?></a></li>
             <?php endforeach; ?>
         </ul>
         <h3>Últimas</h3>
