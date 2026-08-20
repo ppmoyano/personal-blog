@@ -5,7 +5,27 @@ require_once __DIR__ . '/Parsedown.php';
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = urldecode($path);
 
-if (php_sapi_name() === 'cli-server' && preg_match('/\.(css|js|png|jpg|jpeg|gif)$/', $path)) {
+if ($path === '/favicon.ico') {
+    $filePath = __DIR__ . '/../content/files/favicon.ico';
+    if (is_file($filePath)) {
+        header('Content-Type: image/x-icon');
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit;
+    }
+}
+
+if ($path === '/favicon.png') {
+    $filePath = __DIR__ . '/../content/files/favicon.png';
+    if (is_file($filePath)) {
+        header('Content-Type: image/png');
+        header('Content-Length: ' . filesize($filePath));
+        readfile($filePath);
+        exit;
+    }
+}
+
+if (php_sapi_name() === 'cli-server' && preg_match('/\.(css|js|png|jpg|jpeg|gif|ico)$/', $path)) {
     return false;
 }
 
@@ -23,6 +43,7 @@ if (strpos($path, '/content/files/') === 0) {
             'svg'  => 'image/svg+xml',
             'txt'  => 'text/plain',
             'zip'  => 'application/zip',
+            'ico'  => 'image/x-icon',
         ];
         $contentType = $mimeTypes[strtolower($ext)] ?? 'application/octet-stream';
         header('Content-Type: ' . $contentType);
@@ -307,6 +328,8 @@ ob_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My fake plastic blog</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root { 
